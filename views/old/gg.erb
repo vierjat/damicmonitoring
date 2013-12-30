@@ -1,0 +1,41 @@
+<html>
+
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+     
+     function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Temperature', 'Log(Pressure)']
+          <%= @coco %>
+        ]);
+
+        var options = {
+          title: 'DAMIC monitoring data',
+          dateFormat: 'dd.MM.yy hh:mm',
+          hAxis: {format: 'Y,M,d,H'},
+          hAxis: {title: 'Date'},
+          pointSize: 2,
+          vAxes: {0: {logScale: false, title: 'Temperature', viewWindowMode: 'explicit', viewWindow: { max: 300, min: 100,} },
+                  1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
+          series:{0:{targetAxisIndex:0},
+                  1:{targetAxisIndex:1}}
+//           , explorer: {}        
+        };
+        
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+//         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+      
+    </script>
+  </head>
+  
+  
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+  
+</html>

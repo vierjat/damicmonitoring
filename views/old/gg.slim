@@ -1,0 +1,33 @@
+
+    script type="text/javascript" src="https://www.google.com/jsapi"
+    script type="text/javascript"
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+     
+      function drawChart() {
+          var data = google.visualization.arrayToDataTable([
+            ['Date', 'Temperature', 'pp']
+            == @coco
+          ]);
+
+          var options = {
+            title: 'DAMIC monitoring data',
+            dateFormat: 'dd.MM.yy hh:mm',
+            hAxis: {format: 'Y,M,d,H'},
+            hAxis: {title: 'Date'},
+            vAxis: {title: 'Temperature'},
+            pointSize: 2,
+            vAxes: {0: {logScale: false},
+                    1: {logScale: false}},
+            series:{0:{targetAxisIndex:0},
+                    1:{targetAxisIndex:1}}
+          };
+          
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+  //         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+          chart.draw(data, options);
+        }
+      
+  
+  body
+    div id="chart_div" style="width: 900px; height: 500px;"

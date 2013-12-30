@@ -1,0 +1,19 @@
+<html>
+
+<body>
+  <h1><%=@coco%></h1>
+  <h2><%=@time%><h2>
+
+  <form action="/send_message" method="post">
+    <input type="text" name="message1"/>
+    <input type="text" name="message2"/>
+    <input type="submit" val="Submit"/>
+  </form>
+  
+  <pre>
+    <%= `echo ==============` %>
+  </pre>
+  
+</body>
+
+</html>

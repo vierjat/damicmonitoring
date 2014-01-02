@@ -79,17 +79,20 @@ get '/getDataCube' do
 
   data_set_temp = client.read_key("temp2", start, stop, :interval => "0.5min", :function => "max")
   
+  data_set_pres = client.read_key("htr2", start, stop, :interval => "0.5min", :function => "max")
+  
   maxTemp = 0;
   minTemp = 1000;
 
   data = "{"      
   data = data + "  \"cols\": [{\"id\": \"Date\", \"label\": \"Date\", \"type\": \"datetime\"},"
-  data = data + "             {\"id\": \"Temp\", \"label\": \"Temperature\", \"type\": \"number\"}] ,"
+  data = data + "           {\"id\": \"Temp\", \"label\": \"Temperature\", \"type\": \"number\"},"
+  data = data + "           {\"id\": \"Pres\", \"label\": \"Heater power\", \"type\": \"number\"} ],"
   data = data + "\"rows\": ["
   
   for event in data_set_temp.data
     if event.value > 0
-      data = data + "{\"c\":[ {\"v\": \"Date(#{event.ts.to_i * 1000})\"}, {\"v\": #{event.value}}] },"
+      data = data + "{\"c\":[ {\"v\": \"Date(#{event.ts.to_i * 1000})\"}, {\"v\": #{event.value}}, {\"v\": \"null\"}]},"
       if event.value > maxTemp
         maxTemp = event.value
       end
@@ -101,11 +104,17 @@ get '/getDataCube' do
   maxTemp = maxTemp+1
   minTemp = minTemp-1
   
+  for event in data_set_pres.data
+    if event.value > -1000
+      data = data + "{\"c\":[ {\"v\": \"Date(#{event.ts.to_i * 1000})\"}, {\"v\": \"null\"}, {\"v\": #{event.value}}]} ,"
+    end
+  end
+  
   data = data[0..-2]
   
 #   puts data
   
-  plotTitle = "CUBE-2 monitoring data (last three hours): #{Time.now}"
+  plotTitle = "DAMIC monitoring data (last three hours): #{Time.now}"
   
   data = data + "]"
   data = data + ",\"p\": {\"plotTitle\": \"#{plotTitle}\", \"minTemp\": #{minTemp}, \"maxTemp\": #{maxTemp}}"

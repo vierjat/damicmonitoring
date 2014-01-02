@@ -19,10 +19,11 @@ function drawChart() {
     hAxis: {format: 'Y,M,d,H'},
     hAxis: {title: 'Date'},
     pointSize: 2,
-    vAxes: {0: {logScale: false, title: 'Temperature', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
+    vAxes: {0: {logScale: false, title: 'Temperature [K]', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
             1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
     series:{0:{targetAxisIndex:0},
-            1:{targetAxisIndex:1}}
+            1:{targetAxisIndex:1}},
+            colors: ['#ff0000', '#483D8B']
 //           , explorer: {}        
   };
   
@@ -52,15 +53,14 @@ function drawChartCube() {
     hAxis: {format: 'Y,M,d,H'},
     hAxis: {title: 'Date'},
     pointSize: 2,
-    vAxes: {0: {logScale: false, title: 'Temperature', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
-            1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
+    vAxes: {0: {logScale: false, title: 'Temperature [K]', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
+            1: {logScale: false, title: 'Heater power [%]', viewWindowMode: 'pretty' }},
     series:{0:{targetAxisIndex:0},
-            1:{targetAxisIndex:1}}
-//           , explorer: {}        
+            1:{targetAxisIndex:1}},
+    colors: ['#ff0000', '#808000']
   };
   
   var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-//         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
 

@@ -1,41 +1,42 @@
-<html>
-
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+<!--    <link rel="stylesheet" type="text/css" href="/site.css">
+    <link rel="stylesheet" type="text/css" href="/anytime.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/anytime.js"></script>
+    <script type="text/javascript" src="/anytimetz.js"></script>-->
+                  
+<!--    <script type="text/javascript">
+    $(function(){
+        $('#timeselect').AnyTime_picker( 
+          { format: "%H:%i" } );
+        $('#datetimeselect').AnyTime_picker( 
+          { format: "%Z-%m-%d %H:%i" } );
+    });
+    </script>
+    -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/jscripts.js"></script>
+    <script>
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
-     
-     function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Date', 'Temperature', 'Log(Pressure)']
-          <%= @data %>
-        ]);
-
-        var options = {
-          title: 'DAMIC monitoring data (last three hours)',
-          dateFormat: 'dd.MM.yy hh:mm',
-          hAxis: {format: 'Y,M,d,H'},
-          hAxis: {title: 'Date'},
-          pointSize: 2,
-          vAxes: {0: {logScale: false, title: 'Temperature', viewWindowMode: 'explicit', viewWindow: { max: <%= @maxTemp %>, min: <%= @minTemp %>,} },
-                  1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
-          series:{0:{targetAxisIndex:0},
-                  1:{targetAxisIndex:1}}
-//           , explorer: {}        
-        };
-        
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-//         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
-      
     </script>
   </head>
-  
-  
+
   <body>
+  
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <p id="demo"></p>
+
+<!--     <button type="button" onclick="httpGet()">Try it</button> -->
+    <button type="button" onclick="myFunction()">Refresh</button>
+
+<!--    <form action="/about">
+      date and time: <input id="datetimeselect" type="text" />
+      <input type="submit" value="about">
+    </form> -->
+
   </body>
   
 </html>

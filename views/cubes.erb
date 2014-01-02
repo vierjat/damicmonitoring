@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/jscripts.js"></script>
+    <script>
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChartCube);
+    </script>
+  </head>
+
+  <body>
+  
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <p id="demo"></p>
+
+    <button type="button" onclick="myFunction()">Refresh</button>
+
+  </body>
+  
+</html>

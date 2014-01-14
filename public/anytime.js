@@ -1,9 +1,9 @@
 /*****************************************************************************
  *  FILE:  anytime.js - The Any+Time(TM) JavaScript Library (source)
  *
- *  VERSION: 4.1112B
+ *  VERSION: 4.2013.07.25.a
  *
- *  Copyright 2008-2010 Andrew M. Andrews III (www.AMA3.com). Some Rights 
+ *  Copyright 2008-2013 Andrew M. Andrews III (www.AMA3.com). Some Rights 
  *  Reserved. This work licensed under the Creative Commons Attribution-
  *  Noncommercial-Share Alike 3.0 Unported License except in jurisdicitons
  *  for which the license has been ported by Creative Commons International,
@@ -75,7 +75,6 @@ var AnyTime =
 {
 	// private members
 
-	var __oneDay = (24*60*60*1000);
 	var __daysIn = [ 31,28,31,30,31,30,31,31,30,31,30,31 ];
 	var __iframe = null;
 	var __initialized = false;
@@ -95,6 +94,19 @@ var AnyTime =
   	{
   		return this.each( function(i) { AnyTime.noPicker( this.id ); } );
   	}
+
+  	//  Add methods to jQuery to change the earliest and latest times using
+  	//  the typical jQuery approach.
+  	
+  	jQuery.prototype.AnyTime_setEarliest = function( options )
+    {
+  		return this.each( function(i) { AnyTime.setEarliest( this.id, options ); } );
+    }
+  	
+  	jQuery.prototype.AnyTime_setLatest = function( options )
+    {
+  		return this.each( function(i) { AnyTime.setLatest( this.id, options ); } );
+    }
   	
   	//	Add special methods to jQuery to compute the height and width
 	//	of picker components differently for Internet Explorer 6.x
@@ -145,11 +157,6 @@ var AnyTime =
   	$(document).ready( 
   		function()
 		{
-			//  Ping the server for statistical purposes (remove if offended).
-			
-  			if ( window.location.hostname.length && ( window.location.hostname != 'www.ama3.com' ) )
-  				$(document.body).append('<img src="http://www.ama3.com/anytime/ping/?4.1112A'+(AnyTime.utcLabel?".tz":"")+'" width="0" height="0" />');
-			
 			//  IE6 doesn't float popups over <select> elements unless an
 			//	<iframe> is inserted between them!  The <iframe> is added to
 			//	the page *before* the popups are moved, so they will appear
@@ -662,7 +669,7 @@ AnyTime.Converter = function(options)
 		_offCap = _offP;
 		_offPSI = (-1);
 	    var era = 1;
-      var time = new Date(0,0,1,0,0,0,0);
+      var time = new Date(4,0,1,0,0,0,0);//4=leap year bug
 	    var slen = str.length;
 	    var s = 0;
 	    var tzSign = 1, tzOff = _offP;
@@ -857,10 +864,10 @@ AnyTime.Converter = function(options)
 	            time.setSeconds(Number(str.substr(s+6,2)));
               if ( time.getHours() == 12 )
               {
-	              if ( str.charAt(s) == 'A' )
+	              if ( str.charAt(s+8) == 'A' )
 	                time.setHours(0);
               }
-              else if ( str.charAt(s) == 'P' )
+              else if ( str.charAt(s+8) == 'P' )
 	              time.setHours( time.getHours() + 12 );
 	            s += 10;
 	            break;
@@ -895,6 +902,9 @@ AnyTime.Converter = function(options)
 	                break;
 	            }
 	            break;
+            case 'w': // Day of the week (0=Sunday..6=Saturday) (ignored)
+              s += 1;
+              break;
 	          case 'Y': // Year, numeric, four digits, negative if before 0001
 	            i = 4;
 	            if ( str.substr(s,1) == '-' )
@@ -947,6 +957,7 @@ AnyTime.Converter = function(options)
 		              		sublen = sub.length;
 		              		if ( ( s+sublen <= slen ) && ( str.substr(s,sublen) == sub ) )
 		              		{
+                        s+=sublen;
 		              			matched = true;
 		              			break;
 		              		}
@@ -985,7 +996,6 @@ AnyTime.Converter = function(options)
 	          case 'u': // Week (00..53), where Monday is the first day of the week
 	          case 'V': // Week (01..53), where Sunday is the first day of the week; used with %X
 	          case 'v': // Week (01..53), where Monday is the first day of the week; used with %x
-	          case 'w': // Day of the week (0=Sunday..6=Saturday)
 	          case 'X': // Year for the week where Sunday is the first day of the week, numeric, four digits; used with %V
 	          case 'x': // Year for the week, where Monday is the first day of the week, numeric, four digits; used with %v
 	            throw '%'+this.fmt.charAt(f+1)+' not implemented by AnyTime.Converter';
@@ -1107,7 +1117,7 @@ AnyTime.Converter = function(options)
 	  		_shortMon = 1000;
 	  		for ( i = 0 ; i < 12 ; i++ )
 	  		{
-	  			var len = _this.mNames[i].length;
+	  			len = _this.mNames[i].length;
 	  			if ( len > _longMon )
 					_longMon = len;
 	  			if ( len < _shortMon )
@@ -1305,7 +1315,7 @@ AnyTime.picker = function( id, options )
 	//  if one does not already exist.
 	
     if ( __pickers[id] )
-    	throw 'Cannot create another AnyTime picker for "'+id+'"';
+    	throw 'Cannot create another AnyTime.picker for "'+id+'"';
 
 	var _this = null;
 
@@ -1389,7 +1399,7 @@ AnyTime.picker = function( id, options )
 		{
 			_this = this;
 
-			this.id = 'AnyTime--'+id;
+      this.id = 'AnyTime--'+id.replace(/[^-_.A-Za-z0-9]/g,'--AnyTime--');
 
 			options = jQuery.extend(true,{},options||{});
 		  	options.utcParseOffsetCapture = true;
@@ -1470,7 +1480,7 @@ AnyTime.picker = function( id, options )
 		  	//  Popup pickers will be moved to the end of the body
 		  	//  once the entire page has loaded.
 
-		  	this.inp = $('#'+id);
+        this.inp = $(document.getElementById(id)); // avoids ID-vs-pseudo-selector probs like id="foo:bar"
 		  	this.div = $( '<div class="AnyTime-win AnyTime-pkr ui-widget ui-widget-content ui-corner-all" style="width:0;height:0" id="' + this.id + '" aria-live="off"/>' );
 		    this.inp.after(this.div);
 		  	this.wMinW = this.div.outerWidth(!$.browser.safari);
@@ -1487,7 +1497,7 @@ AnyTime.picker = function( id, options )
 		  	
 		  	//  Add dismiss box to title (if popup)
 
-		  	var t = null;
+		  	t = null;
 		  	var xDiv = null;
 		  	if ( this.pop )
 		  	{
@@ -1498,8 +1508,7 @@ AnyTime.picker = function( id, options )
 
 		  	//  date (calendar) portion
 
-		  	var lab = '';
-		  	
+		  	lab = '';
 		  	if ( askDate )
 		  	{
 			  this.dD = $( '<div class="AnyTime-date" style="width:0;height:0"/>' );
@@ -2226,13 +2235,13 @@ AnyTime.picker = function( id, options )
 		dismiss: function(event)
 		{
 			this.ajax();
-			this.div.hide();
 			if ( __iframe )
 				__iframe.hide();
 			if ( this.yDiv )
 				this.dismissYDiv();
 			if ( this.oDiv )
 				this.dismissODiv();
+			this.div.hide();
 			this.lostFocus = true;
 		},
 	
@@ -2336,7 +2345,9 @@ AnyTime.picker = function( id, options )
 		
 		key: function(event)
 		{
+      var mo;
 			var t = null;
+      var _this = this;
 			var elem = this.div.find('.AnyTime-focus-btn');
 		    var key = event.keyCode || event.which;
 		    this.denyTab = true;
@@ -2405,7 +2416,7 @@ AnyTime.picker = function( id, options )
 				    		t.setFullYear(t.getFullYear()-1);
 				    	else
 				    	{
-				    		var mo = t.getMonth()-1;
+				    		mo = t.getMonth()-1;
 		    				if ( t.getDate() > __daysIn[mo] )
 		    					t.setDate(__daysIn[mo])
 			    			t.setMonth(mo);
@@ -2546,7 +2557,7 @@ AnyTime.picker = function( id, options )
 				    		t.setFullYear(t.getFullYear()+1);
 				    	else
 				    	{
-				    		var mo = t.getMonth()+1;
+				    		mo = t.getMonth()+1;
 		    				if ( t.getDate() > __daysIn[mo] )
 		    					t.setDate(__daysIn[mo])
 			    			t.setMonth(mo);
@@ -2665,35 +2676,50 @@ AnyTime.picker = function( id, options )
 		    else if ( key == 37 ) // left arrow
 		    {
 		    	if ( this.fBtn.hasClass('AnyTime-dom-btn') )
-		    		this.keyDateChange(new Date(this.time.getTime()-__oneDay));
+          {
+			      t = new Date(this.time.getTime());
+            t.setDate(t.getDate()-1);
+		    		this.keyDateChange(t);
+          }
 		    	else
 		    		this.keyBack();
 		    }
 		    else if ( key == 38 ) // up arrow
 		    {
 		    	if ( this.fBtn.hasClass('AnyTime-dom-btn') )
-		    		this.keyDateChange(new Date(this.time.getTime()-(7*__oneDay)));
+          {
+			      t = new Date(this.time.getTime());
+            t.setDate(t.getDate()-7);
+		    		this.keyDateChange(t);
+          }
 		    	else
 		    		this.keyBack();
 		    }
 		    else if ( key == 39 ) // right arrow
 		    {
 		    	if ( this.fBtn.hasClass('AnyTime-dom-btn') )
-		    		this.keyDateChange(new Date(this.time.getTime()+__oneDay));
+          {
+			      t = new Date(this.time.getTime());
+            t.setDate(t.getDate()+1);
+		    		this.keyDateChange(t);
+          }
 		    	else
 		    		this.keyAhead();
 		    }
 		    else if ( key == 40 ) // down arrow
 		    {
 		    	if ( this.fBtn.hasClass('AnyTime-dom-btn') )
-		    		this.keyDateChange(new Date(this.time.getTime()+(7*__oneDay)));
+         {
+			      t = new Date(this.time.getTime());
+            t.setDate(t.getDate()+7);
+		    		this.keyDateChange(t);
+          }
 		    	else
 		    		this.keyAhead();
 		    }
 		    else if ( ( ( key == 86 ) || ( key == 118 ) ) && event.ctrlKey )
 		    {
 		    	this.inp.val("").change();
-		    	var _this = this;
 		    	setTimeout( function() { _this.showPkr(null); }, 100 );	
 		    	return;
 		    }
@@ -3113,6 +3139,26 @@ AnyTime.picker = function( id, options )
 		},
 		  
 		//---------------------------------------------------------------------
+		//  .setEarliest() changes the earliest time.
+		//---------------------------------------------------------------------
+		
+		setEarliest: function(newTime)
+		{
+        this.earliest = newTime;
+        this.set(this.time);
+		},
+		  
+		//---------------------------------------------------------------------
+		//  .setLatest() changes the latest time.
+		//---------------------------------------------------------------------
+		
+		setLatest: function(newTime)
+		{
+        this.latest = newTime;
+        this.set(this.time);
+		},
+		  
+		//---------------------------------------------------------------------
 		//  .showPkr() displays the picker and sets the focus psuedo-
 		//	element. The current value in the input field is used to initialize
 		//	the picker.
@@ -3182,7 +3228,7 @@ AnyTime.picker = function( id, options )
 		{
 		    var cmpLo = new Date(this.time.getTime());
 		    cmpLo.setMonth(0,1);
-		    cmpLo.setHours(0,0,0,0);
+		    cmpLo.setHours(12,0,0,0); //12 avoids daylight savings bugs
 		    var cmpHi = new Date(this.time.getTime());
 		    cmpHi.setMonth(11,31);
 		    cmpHi.setHours(23,59,59,999);
@@ -3254,6 +3300,8 @@ AnyTime.picker = function( id, options )
 		
 		    //  Update days.
 		
+		    cmpLo.setFullYear( this.time.getFullYear() );
+		    cmpHi.setFullYear( this.time.getFullYear() );
 		    cmpLo.setMonth( this.time.getMonth() );
 		    cmpHi.setMonth( this.time.getMonth(), 1 );
 		    current = this.time.getDate();
@@ -3319,9 +3367,11 @@ AnyTime.picker = function( id, options )
 		          } );
 		          wom++;
 		      } );
-		
+
 		    //  Update hour.
 		
+		    cmpLo.setFullYear( this.time.getFullYear() );
+		    cmpHi.setFullYear( this.time.getFullYear() );
 		    cmpLo.setMonth( this.time.getMonth(), this.time.getDate() );
 		    cmpHi.setMonth( this.time.getMonth(), this.time.getDate() );
 		    var not12 = ! this.twelveHr;
@@ -3356,7 +3406,7 @@ AnyTime.picker = function( id, options )
 		    //  Update minute.
 		
         cmpLo.setHours( this.time.getHours() );
-        cmpHi.setHours( this.time.getHours() );
+        cmpHi.setHours( this.time.getHours(), 9 );
 		    var units = this.time.getMinutes();
 		    var tens = String(Math.floor(units/10));
 		    var ones = String(units % 10);
@@ -3387,7 +3437,7 @@ AnyTime.picker = function( id, options )
 		    //  Update second.
 		
 		    cmpLo.setMinutes( this.time.getMinutes() );
-		    cmpHi.setMinutes( this.time.getMinutes() );
+		    cmpHi.setMinutes( this.time.getMinutes(), 9 );
 		    units = this.time.getSeconds();
 		    tens = String(Math.floor(units/10));
 		    ones = String(units % 10);
@@ -3651,6 +3701,32 @@ AnyTime.picker = function( id, options )
 	__pickers[id].initialize(id);
 	
 } // AnyTime.picker = 
+
+//=============================================================================
+//  AnyTime.setEarliest()
+//
+//  Updates the earliest date/time for the picker attached to a specified
+//  text field.
+//=============================================================================
+
+AnyTime.setEarliest = function( id, newTime )
+{
+  __pickers[id].setEarliest(newTime)
+};
+
+
+//=============================================================================
+//  AnyTime.setLatest()
+//
+//  Updates the latest date/time for the picker attached to a specified
+//  text field.
+//=============================================================================
+
+AnyTime.setLatest = function( id, newTime )
+{
+  __pickers[id].setLatest(newTime)
+};
+
 
 })(jQuery); // function($)...
 

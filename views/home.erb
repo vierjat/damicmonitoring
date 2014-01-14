@@ -1,20 +1,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-<!--    <link rel="stylesheet" type="text/css" href="/site.css">
-    <link rel="stylesheet" type="text/css" href="/anytime.css">
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="/anytime.js"></script>
-    <script type="text/javascript" src="/anytimetz.js"></script>-->
-                  
-<!--    <script type="text/javascript">
-    $(function(){
-        $('#timeselect').AnyTime_picker( 
-          { format: "%H:%i" } );
-        $('#datetimeselect').AnyTime_picker( 
-          { format: "%Z-%m-%d %H:%i" } );
-    });
-    </script>
-    -->
+  
+    <link rel="stylesheet" type="text/css" href="/anytime.css" />
+    <script src="/jquery.min.js"></script>
+<!--    <script src="jquery-migrate-1.0.0.js"></script>-->
+    <script src="/anytime.js"></script>
+    <script src="/anytimetz.js"></script>
+<script>
+  AnyTime.picker( "field1",{ format: "%W, %M %D in the Year %z %E", firstDOW: 1 } );
+  $("#field2").AnyTime_picker( { format: "%H:%i", labelTitle: "Hora",labelHour: "Hora", labelMinute: "Minuto" } );
+</script>    
+
+    
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="/jscripts.js"></script>
@@ -32,10 +29,13 @@
 <!--     <button type="button" onclick="httpGet()">Try it</button> -->
     <button type="button" onclick="drawChart()">Refresh</button>
 
-<!--    <form action="/about">
+<!--<form method="GET" action="/anytime/"><p class="demo">
+          English: <input type="text" id="field1" size="50" value="Sunday, July 30th in the Year 1967 CE"/><br/>
+          Español: <input type="text" id="field2" value="12:34"/></p></form>     -->
+    <!--<form action="/about">
       date and time: <input id="datetimeselect" type="text" />
       <input type="submit" value="about">
-    </form> -->
+    </form>--> 
 
   </body>
   

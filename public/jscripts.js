@@ -64,6 +64,38 @@ function drawChartCube() {
   chart.draw(data, options);
 }
 
+
+function drawChartConnie() {
+  console.log("drawChartConnie\n");
+  
+  var jsonData = $.ajax({
+          url: "/getDataConnie",
+          dataType:"json",
+          async: false
+          }).responseText;
+  
+  parsedData = JSON.parse(jsonData);
+  
+  // Create our data table out of JSON data loaded from server.
+  var data = new google.visualization.DataTable(jsonData);
+
+  var options = {
+    title: parsedData.p.plotTitle,
+    dateFormat: 'dd.MM.yy hh:mm',
+    hAxis: {format: 'Y,M,d,H'},
+    hAxis: {title: 'Date'},
+    pointSize: 2,
+    vAxes: {0: {logScale: false, title: 'Temperature [K]', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
+            1: {logScale: false, title: 'Heater power [%]', viewWindowMode: 'pretty' }},
+    series:{0:{targetAxisIndex:0},
+            1:{targetAxisIndex:1}},
+    colors: ['#ff0000', '#808000']
+  };
+  
+  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+
 function httpGet(){
   console.log("httpGet\n");
   var xmlHttp = null;

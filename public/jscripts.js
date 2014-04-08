@@ -4,35 +4,50 @@ function drawChart() {
   var timezoneOffset = new Date().getTimezoneOffset();
   var date = $('#datetimepicker').val();
   var params = {date: date, timezoneOffset: timezoneOffset}
-  var jsonData = $.ajax({
-          url: "/getData",
-          data: params,
-          dataType:"json",
-          async: false
-          }).responseText;
 
-  parsedData = JSON.parse(jsonData);
+  var callback = function(jsonData) {
+    var plotTitle = "DAMIC monitoring data: " + new Date();
+    data = {cols: [{id: 'Date', label: 'Date', type: 'datetime'},
+        {id: 'Temp', label: 'Temperature', type: 'number'},
+        {id: 'Pres', label: 'Log(Pressure)', type: 'number'} ],
+      rows: []
+    };
 
-  // Create our data table out of JSON data loaded from server.
-  var data = new google.visualization.DataTable(parsedData);
+    $.each(jsonData['temp'], function(i,el) {
+      data['rows'].push({c:[ {v: new Date(el['ts'])}, {v: el['value']}, {v: null}] });
+    });
 
-  var options = {
-    title: parsedData.p.plotTitle,
-    dateFormat: 'dd.MM.yy hh:mm',
-    hAxis: {format: 'Y,M,d,H'},
-    hAxis: {title: 'Date'},
-    pointSize: 2,
-    vAxes: {0: {logScale: false, title: 'Temperature [K]', viewWindowMode: 'explicit', viewWindow: { max: parsedData.p.maxTemp, min: parsedData.p.minTemp} },
-            1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
-    series:{0:{targetAxisIndex:0},
-            1:{targetAxisIndex:1}},
-            colors: ['#ff0000', '#483D8B']
-//           , explorer: {}
-  };
+    $.each(jsonData['pres'], function(i,el) {
+      data['rows'].push({c:[ {v: new Date(el['ts'])}, {v: null}, {v: el['value']}] });
+    });
 
-  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-//         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
-  chart.draw(data, options);
+    // Create our data table out of JSON data loaded from server.
+    var data = new google.visualization.DataTable(data);
+
+    var options = {
+      title: plotTitle,
+      dateFormat: 'dd.MM.yy hh:mm',
+      hAxis: {format: 'Y,M,d,H'},
+      hAxis: {title: 'Date'},
+      pointSize: 2,
+      vAxes: {0: {logScale: false, title: 'Temperature [K]', viewWindowMode: 'explicit', viewWindow: { max: jsonData['maxTemp'], min: jsonData['minTemp']} },
+              1: {logScale: false, title: 'Log(Pressure)', viewWindowMode: 'pretty' }},
+      series:{0:{targetAxisIndex:0},
+              1:{targetAxisIndex:1}},
+              colors: ['#ff0000', '#483D8B']
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
+
+  $.ajax({
+    url: "/getData",
+    data: params,
+    dataType:"json"
+  }).success(function(data){
+    callback(data);
+  });
 }
 
 

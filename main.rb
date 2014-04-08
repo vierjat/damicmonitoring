@@ -36,42 +36,31 @@ get '/getData' do
   maxTemp = 0;
   minTemp = 1000;
 
-  data = "{"
-  data = data + "  \"cols\": [{\"id\": \"Date\", \"label\": \"Date\", \"type\": \"datetime\"},"
-  data = data + "           {\"id\": \"Temp\", \"label\": \"Temperature\", \"type\": \"number\"},"
-  data = data + "           {\"id\": \"Pres\", \"label\": \"Log(Pressure)\", \"type\": \"number\"} ],"
-  data = data + "\"rows\": ["
+  data = {}
 
-  for event in data_set_temp.data
-    if event.value > 0
-      data = data + "{\"c\":[ {\"v\": \"Date(#{event.ts.to_i * 1000})\"}, {\"v\": #{event.value}}, {\"v\": \"null\"}]},"
-      if event.value > maxTemp
-        maxTemp = event.value
-      end
-      if event.value < minTemp
-        minTemp = event.value
-      end
+  data[:temp] = data_set_temp.data.map do |event|
+    next if event.value <= 0
+    if event.value > maxTemp
+      maxTemp = event.value
+    elsif event.value < minTemp
+      minTemp = event.value
     end
+    {ts: event.ts.to_i * 1000, value: event.value}
   end
+
   maxTemp = maxTemp+1
   minTemp = minTemp-1
 
-  for event in data_set_pres.data
+  data[:pres] = data_set_pres.data.map do |event|
     if event.value > -1000
-      data = data + "{\"c\":[ {\"v\": \"Date(#{event.ts.to_i * 1000})\"}, {\"v\": \"null\"}, {\"v\": #{event.value}}]} ,"
+      {ts: event.ts.to_i * 1000, value: event.value}
     end
   end
 
-  data = data[0..-2]
+  data[:minTemp] = minTemp
+  data[:maxTemp] = maxTemp
 
-#   puts data
-
-  plotTitle = "DAMIC monitoring data (last three hours): #{Time.now}"
-
-  data = data + "]"
-  data = data + ",\"p\": {\"plotTitle\": \"#{plotTitle}\", \"minTemp\": #{minTemp}, \"maxTemp\": #{maxTemp}}"
-
-  data = data + "}"
+  data.to_json
 end
 
 

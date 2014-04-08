@@ -1,15 +1,18 @@
 
 function drawChart() {
-  console.log("drawChart\n");
-  
+
+  var timezoneOffset = new Date().getTimezoneOffset();
+  var date = $('#datetimepicker').val();
+  var params = {date: date, timezoneOffset: timezoneOffset}
   var jsonData = $.ajax({
           url: "/getData",
+          data: params,
           dataType:"json",
           async: false
           }).responseText;
-  
+
   parsedData = JSON.parse(jsonData);
-  
+
   // Create our data table out of JSON data loaded from server.
   var data = new google.visualization.DataTable(parsedData);
 
@@ -24,9 +27,9 @@ function drawChart() {
     series:{0:{targetAxisIndex:0},
             1:{targetAxisIndex:1}},
             colors: ['#ff0000', '#483D8B']
-//           , explorer: {}        
+//           , explorer: {}
   };
-  
+
   var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 //         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
   chart.draw(data, options);
@@ -35,15 +38,15 @@ function drawChart() {
 
 function drawChartCube() {
   console.log("drawChartCube\n");
-  
+
   var jsonData = $.ajax({
           url: "/getDataCube",
           dataType:"json",
           async: false
           }).responseText;
-  
+
   parsedData = JSON.parse(jsonData);
-  
+
   // Create our data table out of JSON data loaded from server.
   var data = new google.visualization.DataTable(jsonData);
 
@@ -59,7 +62,7 @@ function drawChartCube() {
             1:{targetAxisIndex:1}},
     colors: ['#ff0000', '#808000']
   };
-  
+
   var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
@@ -67,15 +70,15 @@ function drawChartCube() {
 
 function drawChartConnie() {
   console.log("drawChartConnie\n");
-  
+
   var jsonData = $.ajax({
           url: "/getDataConnie",
           dataType:"json",
           async: false
           }).responseText;
-  
+
   parsedData = JSON.parse(jsonData);
-  
+
   // Create our data table out of JSON data loaded from server.
   var data = new google.visualization.DataTable(jsonData);
 
@@ -91,7 +94,7 @@ function drawChartConnie() {
             1:{targetAxisIndex:1}},
     colors: ['#ff0000', '#808000']
   };
-  
+
   var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
